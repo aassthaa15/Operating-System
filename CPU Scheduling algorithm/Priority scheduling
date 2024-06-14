@@ -1,0 +1,60 @@
+#include <iostream>
+
+using namespace std;
+
+int main() {
+    const int n = 5; // Number of processes
+    int pid[n] = {1, 2, 3, 4, 5}; // Process IDs
+    int at[n] = {0, 2, 4, 6, 8}; // Arrival Time
+    int bt[n] = {6, 4, 2, 5, 3}; // Burst Time
+    int priority[n] = {2, 1, 4, 3, 5}; // Priority
+    int ct[n], wt[n], tat[n]; // Completion Time, Waiting Time, Turnaround Time
+
+    // Sort by arrival time (Bubble Sort)
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (at[j] > at[j + 1]) {
+                swap(pid[j], pid[j + 1]);
+                swap(at[j], at[j + 1]);
+                swap(bt[j], bt[j + 1]);
+                swap(priority[j], priority[j + 1]);
+            }
+        }
+    }
+
+    int currentTime = 0;
+    for (int i = 0; i < n; i++) {
+        if (currentTime < at[i]) {
+            currentTime = at[i];
+        }
+        int shortest = i;
+        for (int j = i + 1; j < n; j++) {
+            if (at[j] <= currentTime && priority[j] < priority[shortest]) {
+                shortest = j;
+            }
+        }
+        swap(pid[i], pid[shortest]);
+        swap(at[i], at[shortest]);
+        swap(bt[i], bt[shortest]);
+        swap(priority[i], priority[shortest]);
+
+        ct[i] = currentTime + bt[i];
+        tat[i] = ct[i] - at[i];
+        wt[i] = tat[i] - bt[i];
+        currentTime = ct[i];
+    }
+
+    double totalWT = 0, totalTAT = 0;
+    cout << "\nPID\tAT\tBT\tPriority\tCT\tWT\tTAT\n";
+    for (int i = 0; i < n; i++) {
+        totalWT += wt[i];
+        totalTAT += tat[i];
+        cout << pid[i] << "\t" << at[i] << "\t" << bt[i] << "\t" << priority[i] << "\t""\t"
+             << ct[i] << "\t" << wt[i] << "\t" << tat[i] << "\n";
+    }
+
+    cout << "\nAvg WT: " << totalWT / n << "\n";
+    cout << "Avg TAT: " << totalTAT / n << "\n";
+
+    return 0;
+}
